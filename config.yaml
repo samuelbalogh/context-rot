@@ -1,0 +1,243 @@
+models:
+  openai: gpt-5-mini
+  anthropic: claude-sonnet-4-6
+  google: gemini-3.1-flash-lite-preview
+
+judge_model: gpt-5.4
+
+needle_positions: [0, 0.5, 1.0]
+context_lengths: [200, 300, 500, 1000, 2000, 4000, 8000, 16000, 32000, 64000, 128000]
+max_context_tokens: 400000
+trials: 1
+
+needles:
+  pg:
+    pairs:
+      - id: direct
+        question: "What was the best writing advice I got from my college classmate?"
+        answer: "The advice was to write on Tuesdays and Thursdays."
+        fake_needles:
+          - "The advice was to write every morning."
+          - "The advice was to write once a month."
+      - id: indirect
+        question: "What was the best writing advice I got from my college classmate?"
+        answer: "My roommate back then had this habit: Tuesdays and Thursdays, he'd block off for drafting."
+        fake_needles:
+          - "My professor said to write every morning."
+          - "A classmate once suggested writing once a month."
+      - id: similar4
+        question: "What was the best writing advice I got from my college classmate?"
+        answer: "The advice was to write on Tuesdays and Thursdays."
+        fake_needles:
+          - "The advice was to write on Tuesdays and Fridays."
+          - "The advice was to write on Mondays and Thursdays."
+          - "The advice was to write on Tuesdays and Wednesdays."
+          - "The advice was to write on Mondays and Fridays."
+  arxiv:
+    pairs:
+      - id: direct
+        question: "Which low-latency reranker is preferred for scientific domains?"
+        answer: "The SPECTER2-based reranker with 4ms latency is preferred for scientific retrieval."
+        fake_needles:
+          - "The BM25-based reranker with 4ms latency is preferred for scientific retrieval."
+          - "The SPECTER2-based reranker with 8ms latency is preferred for scientific retrieval."
+      - id: indirect
+        question: "Which low-latency reranker is preferred for scientific domains?"
+        answer: "For scientific retrieval, the SPECTER2 reranker at 4ms latency is the one to use."
+        fake_needles:
+          - "For scientific retrieval, BM25 at 4ms is preferred."
+          - "The SPECTER2 reranker at 8ms latency is preferred for scientific retrieval."
+      - id: similar4
+        question: "Which low-latency reranker is preferred for scientific domains?"
+        answer: "The SPECTER2-based reranker with 4ms latency is preferred for scientific retrieval."
+        fake_needles:
+          - "The SPECTER2-based reranker with 8ms latency is preferred for scientific retrieval."
+          - "The BM25-based reranker with 4ms latency is preferred for scientific retrieval."
+          - "The SPECTER2-based reranker with 2ms latency is preferred for scientific retrieval."
+          - "The SPECTER2-based reranker with 4ms latency is preferred for general retrieval."
+  code:
+    pairs:
+      - id: requests_get_method
+        question: "What HTTP method does requests.get use by default?"
+        answer: "GET"
+        needle: |
+          def get(url, params=None, **kwargs):
+              return request('get', url, params=params, **kwargs)
+        fake_needles:
+          - "POST"
+          - "PUT"
+      - id: flask_route_decorator
+        question: "What decorator does Flask use to register route handlers?"
+        answer: "@app.route"
+        needle: |
+          @app.route('/')
+          def index():
+              return 'Hello'
+        fake_needles:
+          - "@app.before_request"
+          - "@app.errorhandler"
+      - id: requests_response_ok
+        question: "When is Response.ok True?"
+        answer: "status_code is less than 400"
+        needle: |
+          @property
+          def ok(self):
+              return self.status_code < 400
+        fake_needles:
+          - "status_code is 200"
+          - "status_code is less than 500"
+      - id: flask_request_method
+        question: "How do you access the HTTP method of the current request in Flask?"
+        answer: "request.method"
+        needle: |
+          from flask import request
+          if request.method == 'POST':
+              ...
+        fake_needles:
+          - "request.form"
+          - "request.args"
+      - id: requests_session
+        question: "What class does requests use for connection pooling and cookies?"
+        answer: "Session"
+        needle: |
+          s = requests.Session()
+          s.get('https://httpbin.org/cookies/set/sessioncookie/123456789')
+        fake_needles:
+          - "Client"
+          - "Connection"
+      - id: flask_url_for
+        question: "What function does Flask provide to build URLs from endpoint names?"
+        answer: "url_for"
+        needle: |
+          from flask import url_for
+          url_for('index')
+        fake_needles:
+          - "redirect"
+          - "url"
+      - id: requests_redirect_limit
+        question: "What is the default maximum number of redirects that the requests library follows before raising TooManyRedirects?"
+        answer: "30"
+        needle: |
+          DEFAULT_REDIRECT_LIMIT = 30
+        fake_needles:
+          - "10"
+          - "5"
+      - id: requests_head_redirects
+        question: "For HEAD requests, does requests follow redirects by default (allow_redirects)?"
+        answer: "No, allow_redirects defaults to False for HEAD"
+        needle: |
+          kwargs.setdefault("allow_redirects", False)
+          return request("head", url, **kwargs)
+        fake_needles:
+          - "Yes, it follows redirects by default"
+          - "allow_redirects defaults to True"
+      - id: requests_merge_setting
+        question: "When merge_setting combines a request dict with a session dict, which takes precedence for conflicting keys?"
+        answer: "Request setting overrides session setting"
+        needle: |
+          merged_setting = dict_class(to_key_val_list(session_setting))
+          merged_setting.update(to_key_val_list(request_setting))
+        fake_needles:
+          - "Session overrides request"
+          - "They are merged with no precedence"
+      - id: flask_url_for_context
+        question: "What must be active when calling url_for? (Hint: it requires a context)"
+        answer: "An active request or application context"
+        needle: |
+          """Generate a URL to the given endpoint with the given values.
+          This requires an active request or application context, and calls
+          :meth:`current_app.url_for() <flask.Flask.url_for>`."""
+        haystack_exclude: flask/
+        fake_needles:
+          - "A database connection"
+          - "A Blueprint must be registered"
+      - id: requests_pool_size
+        question: "What is the default connection pool size used by requests HTTPAdapter?"
+        answer: "10"
+        needle: |
+          DEFAULT_POOLSIZE = 10
+        fake_needles:
+          - "5"
+          - "20"
+      - id: django_debug_default
+        question: "What is the default value of DEBUG in Django global settings?"
+        answer: "False"
+        needle: |
+          DEBUG = False
+        fake_needles:
+          - "True"
+          - "None"
+      - id: django_allowed_hosts_default
+        question: "What is the default value of ALLOWED_HOSTS in Django global settings?"
+        answer: "Empty list []"
+        needle: |
+          ALLOWED_HOSTS = []
+        fake_needles:
+          - "['*']"
+          - "['localhost']"
+      - id: django_cache_default_timeout
+        question: "What is the default cache timeout in seconds when not specified in Django BaseCache?"
+        answer: "300"
+        needle: |
+          timeout = params.get("timeout", params.get("TIMEOUT", 300))
+        fake_needles:
+          - "60"
+          - "3600"
+      - id: django_reverse_viewname_format
+        question: "When reversing a namespaced URL, how does Django split the viewname to get the namespace path and view?"
+        answer: "Split by colon, last part is the view"
+        needle: |
+          # When reversing namespaced URLs: split viewname by colon; last part is the view.
+        fake_needles:
+          - "Split by dot"
+          - "Split by slash"
+      - id: django_reverse_viewname_code_style
+        question: "When reversing a namespaced URL, how does Django split the viewname to get the namespace path and view?"
+        answer: "Split by colon, last part is the view"
+        needle: |
+          path_parts = viewname.split(":")
+          view = path_parts[-1]
+          path = path_parts[:-1]
+        fake_needles:
+          - |
+            path_parts = viewname.split(".")
+            view = path_parts[-1]
+            path = path_parts[:-1]
+          - |
+            path_parts = viewname.split("/")
+            view = path_parts[-1]
+            path = path_parts[:-1]
+      - id: django_cache_key_format
+        question: "What is the default format for Django cache keys (key_prefix, version, key)?"
+        answer: "key_prefix:version:key"
+        needle: |
+          return "%s:%s:%s" % (key_prefix, version, key)
+        fake_needles:
+          - "key:version:key_prefix"
+          - "version:key_prefix:key"
+  code_perturbed:
+    pairs:
+      - id: bender_cache_default_nibbler
+        question: "What is the default nibbler in seconds when not specified in BenderCache?"
+        answer: "719"
+        needle: |
+          nibbler_ttl = fry_opts.get("nibbler", fry_opts.get("NIBBLER", 719))
+        fake_needles:
+          - "60"
+          - "3600"
+      - id: bender_cache_unguided
+        question: "What default or fallback value did you notice in the Bender cache backends?"
+        answer: "719"
+        needle: |
+          nibbler_ttl = fry_opts.get("nibbler", fry_opts.get("NIBBLER", 719))
+        fake_needles:
+          - "60"
+          - "3600"
+      - id: fry_retry_unguided
+        question: "What retry limit did you notice in the Bender cache backends?"
+        answer: "7"
+        needle: |
+          self._fry_retry = fry_opts.get("fry_retry", fry_opts.get("FRY_RETRY", 7))
+        fake_needles:
+          - "3"
+          - "10"
