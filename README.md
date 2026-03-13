@@ -15,6 +15,7 @@ config.yaml + .env  -->  Haystack (PG + arXiv)  -->  Classic NIAH  -->  Provider
 ```
 
 - **Haystacks**: PG essays from paulgraham.com, arXiv abstracts from cs.IR/cs.CL, OSS code (requests, flask)
+- **Perturbed codebase** (`code_perturbed`): Django cache module copied and systematically renamed (`scripts/perturb_django.py`) so the model cannot rely on parametric knowledge. Identifiers like `BaseCache`, `max_entries`, `timeout` become `BenderCache`, `scruffy_limit`, `nibbler`; default values (e.g. 300, 3) are perturbed to 719, 417, 13. This setup reproduces the **lost-in-the-middle** effect: accuracy is high at short context (e.g. 100% at 200 tokens) and drops sharply at longer lengths (e.g. 6.7% at 64K).
 - **Experiment**: Insert needle at 0%, 50%, 100% of context; vary context length (1K–128K)
 - **Judge**: GPT-4o evaluates model output vs expected needle
 - **Output**: `results/` with JSON, CSV, and HTML report (Chart.js)
@@ -43,6 +44,9 @@ make fetch-haystacks   # Download PG essays + arXiv papers (cached in data/)
 make run          # Full experiment (3 models, pg+arxiv variants, 6 lengths, 3 positions)
 make run-quick    # 1 model, 6 calls
 make run-code     # Code variant only (requests/flask haystack, coding needles)
+make perturb-django       # Build django_perturbed (required before run-code-perturbed)
+make run-code-perturbed   # Perturbed variant (BenderCache needles, lost-in-the-middle)
+make run-code-perturbed-sweep  # Full sweep: bender_cache_unguided, all context lengths
 make report       # Regenerate HTML from existing results
 ```
 
