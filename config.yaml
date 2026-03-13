@@ -241,3 +241,21 @@ needles:
         fake_needles:
           - "3"
           - "10"
+      - id: scruffy_limit_unguided
+        question: "What capacity limit or max entries value did you notice in the Bender cache backends?"
+        answer: "417"
+        needle: |
+          scruffy_limit = fry_opts.get("scruffy_limit", leela_cfg.get("SCRUFFY_LIMIT", 417))
+        fake_needles:
+          - "100"
+          - "500"
+          - "1000"
+      - id: kif_rate_unguided
+        question: "What divisor or rate value did you notice in the Bender cache eviction logic?"
+        answer: "13"
+        needle: |
+          kif_rate = fry_opts.get("kif_rate", leela_cfg.get("KIF_RATE", 13))
+        fake_needles:
+          - "1"
+          - "5"
+          - "10"

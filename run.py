@@ -122,7 +122,7 @@ def main():
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--max-calls", type=int, default=None)
     parser.add_argument("--models", type=str, default=None)
-    parser.add_argument("--workers-per-provider", type=int, default=3)
+    parser.add_argument("--workers-per-provider", type=int, default=6)
     parser.add_argument("--context-lengths", type=str, default=None, help="Comma-separated token counts, e.g. 6000")
     parser.add_argument("--needle-positions", type=str, default=None, help="Comma-separated positions 0-1, e.g. 0.5")
     parser.add_argument("--variant", type=str, default="pg,arxiv", help="Comma-separated variants: pg, arxiv, code. Default: pg,arxiv")
@@ -254,6 +254,7 @@ def main():
             if answer_for_judge not in haystack:
                 logger.warning("Expected answer %r not in context (needle may contain it): variant=%s pair=%s", answer_for_judge, variant, pair_id)
     logger.info("Verified needle in context for %d unique cases", len(seen))
+    logger.info("Models: %s", ", ".join(f"{p}/{m}" for p, m in providers_config))
     if trials > 1:
         logger.info("Running %d trials per condition in parallel (%d total work items)", trials, len(all_work))
 

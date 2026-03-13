@@ -80,7 +80,23 @@ def perturb_content(text: str, rel_path: str) -> str:
         result = re.sub(r"timeout = int\(timeout\)", "nibbler_ttl = int(nibbler_ttl)", result)
         result = result.replace(
             'self._kif_rate = 3\n\n        self.zoidberg_prefix = fry_opts.get("ZOIDBERG_PREFIX", "")',
-            'self._kif_rate = 3\n\n        self._fry_retry = fry_opts.get("fry_retry", fry_opts.get("FRY_RETRY", 7))\n\n        self.zoidberg_prefix = fry_opts.get("ZOIDBERG_PREFIX", "")',
+            'self._kif_rate = 13\n\n        self._fry_retry = fry_opts.get("fry_retry", fry_opts.get("FRY_RETRY", 7))\n\n        self.zoidberg_prefix = fry_opts.get("ZOIDBERG_PREFIX", "")',
+        )
+        result = result.replace(
+            'leela_cfg.get("SCRUFFY_LIMIT", 300)',
+            'leela_cfg.get("SCRUFFY_LIMIT", 417)',
+        )
+        result = result.replace(
+            'self._scruffy_limit = 300',
+            'self._scruffy_limit = 417',
+        )
+        result = result.replace(
+            'leela_cfg.get("KIF_RATE", 3)',
+            'leela_cfg.get("KIF_RATE", 13)',
+        )
+        result = result.replace(
+            'self._kif_rate = 3',
+            'self._kif_rate = 13',
         )
     return result
 
