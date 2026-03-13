@@ -1,6 +1,6 @@
 # Context Rot Needle-in-Haystack Experiment
 
-Replicates [Chroma's Context Rot](https://research.trychroma.com/context-rot) NIAH methodology. Classic needle-in-haystack with Paul Graham essays and arXiv papers as haystacks.
+Replicates [Chroma's Context Rot](https://research.trychroma.com/context-rot) NIAH methodology. Classic needle-in-haystack with PG essays and arXiv; plus a Futurama-perturbed Django cache codebase (BenderCache, nibbler, scruffy_limit) that reproduces lost-in-the-middle.
 
 ## Architecture
 
