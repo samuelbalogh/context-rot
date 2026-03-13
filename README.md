@@ -2,6 +2,8 @@
 
 Replicates [Chroma's Context Rot](https://research.trychroma.com/context-rot) NIAH methodology. Classic needle-in-haystack with PG essays and arXiv; plus a Futurama-perturbed Django cache codebase (BenderCache, nibbler, scruffy_limit) that reproduces lost-in-the-middle.
 
+![Accuracy vs context length (perturbed codebase)](assets/context-rot-chart.png)
+
 ## Architecture
 
 ```
@@ -48,6 +50,7 @@ make perturb-django       # Build django_perturbed (required before run-code-per
 make run-code-perturbed   # Perturbed variant (BenderCache needles, lost-in-the-middle)
 make run-code-perturbed-sweep  # Full sweep: bender_cache_unguided, all context lengths
 make report       # Regenerate HTML from existing results
+make export-chart # Export accuracy-vs-length chart to assets/ (requires --extra chart)
 ```
 
 ## CLI Options
@@ -91,6 +94,7 @@ Unit tests cover config, haystack builder, PG/arXiv parsing, metrics, output wri
 context-rot/
 ├── run.py              # CLI entry
 ├── config.yaml
+├── assets/             # Chart PNG (make export-chart)
 ├── src/
 │   ├── config.py
 │   ├── providers/      # OpenAI, Anthropic, Google
